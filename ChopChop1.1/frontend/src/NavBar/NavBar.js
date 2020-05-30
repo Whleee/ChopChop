@@ -10,7 +10,7 @@ const styles = {
   },
 
   LogInOut: {
-    fontSize: '50px',
+    fontSize: '35px',
     fontWeight: 'bold',
     fontFamily: 'Courier New',
   },
