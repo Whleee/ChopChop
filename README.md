@@ -1,7 +1,7 @@
 # ChopChop
 ## Features to be implemented
-1. Design an attractive nmobile webpage.
-2. Using Google location API to find places of interest near the user.
+1. Design an attractive mobile webpage.
+2. Using Google Maps API to find places of interest near the user.
 3. Using sorting algorithms to sort the places according to the distance.
 4. Using sorting algorithms to sort the places into their cattegories as follows:
   * Food
