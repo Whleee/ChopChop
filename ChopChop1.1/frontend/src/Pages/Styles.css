@@ -85,6 +85,24 @@
   margin: 0 auto;
 }
 
+#add-cat {
+  width: 400px;
+  margin: 0 auto;
+}
+
+#add-cat select {
+  display: block;
+  margin: 20px 0;
+  padding: 10px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  border-radius: 4px 0 0 4px;
+  box-sizing: border-box;
+  width: 300px;
+  float: left;
+  clear: both;
+}
+
 #add-book input {
   display: block;
   margin: 20px 0;

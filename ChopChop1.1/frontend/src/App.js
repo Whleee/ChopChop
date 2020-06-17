@@ -12,6 +12,7 @@ import { Map, Marker, GoogleApiWrapper, InfoWindow } from "google-maps-react";
 import CurrentLocation from "./Map";
 import Favourites from "./Pages/Favourites";
 import History from "./Pages/History";
+import Blacklist from "./Pages/Blacklist";
 
 class App extends Component {
   constructor(props) {
@@ -64,6 +65,7 @@ class App extends Component {
         <Route exact path="/" component={Distance} />
         <Route exact path="/History" component={History} />
         <Route exact path="/Fav" component={Favourites} />
+        <Route exact path="/Blacklist" component={Blacklist} />
         <SecuredRoute
           path="/new-question"
           component={NewQuestion}

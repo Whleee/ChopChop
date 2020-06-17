@@ -9,6 +9,12 @@ const styles = {
     fontFamily: "Courier New",
   },
 
+  ChopChopPages: {
+    fontSize: "45px",
+    fontWeight: "bold",
+    fontFamily: "Courier New",
+  },
+
   LogInOut: {
     fontSize: "35px",
     fontWeight: "bold",
@@ -33,11 +39,18 @@ function NavBar(props) {
       <Link className="navbar-brand" style={styles.ChopChopHead} to="/">
         ChopChop
       </Link>
-      <Link className="navbar-brand" style={styles.ChopChopHead} to="/History">
+      <Link className="navbar-brand" style={styles.ChopChopPages} to="/History">
         History
       </Link>
-      <Link className="navbar-brand" style={styles.ChopChopHead} to="/Fav">
+      <Link className="navbar-brand" style={styles.ChopChopPages} to="/Fav">
         Favourites
+      </Link>
+      <Link
+        className="navbar-brand"
+        style={styles.ChopChopPages}
+        to="/Blacklist"
+      >
+        Blacklist
       </Link>
       {!auth0Client.isAuthenticated() && (
         <button

@@ -5,12 +5,12 @@ import firebase from "../firebase";
 
 const db = firebase.firestore();
 
-class Favourites extends Component {
+class Blacklist extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      Favourites: null,
+      Blacklist: null,
     };
   }
 
@@ -28,7 +28,7 @@ class Favourites extends Component {
     const catForm = forms["add-cat"];
     const addForm = forms["add-book"];
 
-    db.collection("Favourites").add({
+    db.collection("Blacklist").add({
       name: addForm.querySelector('input[type = "text"]').value,
       category: catForm.querySelector("#category-list").value,
     });
@@ -82,7 +82,7 @@ class Favourites extends Component {
     }
 
     function display() {
-      db.collection("Favourites")
+      db.collection("Blacklist")
         .get()
         .then((snapshot) => {
           snapshot.docs.forEach((doc) => {
@@ -93,7 +93,7 @@ class Favourites extends Component {
 
     function handleDelete() {
       let id = this.parentElement.getAttribute("data-id");
-      db.collection("Favourites")
+      db.collection("Blacklist")
         .doc(id)
         .delete();
     }
@@ -104,18 +104,18 @@ class Favourites extends Component {
         <div id="wrapper">
           <header>
             <div id="page-banner">
-              <h1 class="title">Favourites Page</h1>
+              <h1 class="title">Blacklist Page</h1>
               <form id="search-books">
                 <input
                   type="text"
-                  placeholder="Search Favourites..."
+                  placeholder="Search Blacklist..."
                   onChange={this.handleSearch}
                 />
               </form>
             </div>
           </header>
           <div id="book-list">
-            <h2 class="title">Recently Liked:</h2>
+            <h2 class="title">Recently Blacklisted:</h2>
             <ul>{display()}</ul>
           </div>
           <form id="add-cat">
@@ -137,4 +137,4 @@ class Favourites extends Component {
   }
 }
 
-export default Favourites;
+export default Blacklist;
