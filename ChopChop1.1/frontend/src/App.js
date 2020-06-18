@@ -1,21 +1,22 @@
-import React, { Component } from "react";
-import { Route, withRouter } from "react-router-dom";
-import auth0Client from "./Auth";
-import NavBar from "./NavBar/NavBar";
-import Question from "./Question/Question";
-import Questions from "./Questions/Questions";
-import Callback from "./Callback";
-import NewQuestion from "./NewQuestion/NewQuestion";
-import SecuredRoute from "./SecuredRoute/SecuredRoute";
-import Distance from "./Distance/Distance";
-import { Map, Marker, GoogleApiWrapper, InfoWindow } from "google-maps-react";
-import CurrentLocation from "./Map";
-import Favourites from "./Pages/Favourites";
-import History from "./Pages/History";
+import React, { Component } from "react"
+import { Route, withRouter } from "react-router-dom"
+import auth0Client from "./Auth"
+import NavBar from "./NavBar/NavBar"
+import Introduction from "./Introduction/Introduction"
+import Callback from "./Callback"
+import Distance from "./Distance/Distance"
+import { Marker, GoogleApiWrapper, InfoWindow } from "google-maps-react"
+import CurrentLocation from "./Map"
+import Favourites from "./Pages/Favourites"
+import History from "./Pages/History"
+import { BrowserRouter as Router, Switch } from 'react-router-dom'
+
+
 
 class App extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
       checkingSession: true,
       showingInfoWindow: false,
@@ -58,22 +59,11 @@ class App extends Component {
     return (
       <div>
         <NavBar />
-        <Route exact path="/" component={Questions} />
-        <Route exact path="/question/:questionId" component={Question} />
+        <Route exact path="/" component={Introduction} />
         <Route exact path="/callback" component={Callback} />\
         <Route exact path="/" component={Distance} />
         <Route exact path="/History" component={History} />
         <Route exact path="/Fav" component={Favourites} />
-        <SecuredRoute
-          path="/new-question"
-          component={NewQuestion}
-          checkingSession={this.state.checkingSession}
-        />
-        <script src="https://www.gstatic.com/firebasejs/7.14.5/firebase-app.js" />
-        <script src="https://www.gstatic.com/firebasejs/7.14.5/firebase-analytics.js" />
-        <script>
-          firebase.initializeApp(firebaseConfig); firebase.analytics();
-        </script>
         <CurrentLocation centerAroundCurrentLocation google={this.props.google}>
           <Marker onClick={this.onMarkerClick} name={"current location"} />
           <InfoWindow
@@ -87,6 +77,7 @@ class App extends Component {
           </InfoWindow>
         </CurrentLocation>
       </div>
+      
     );
   }
 }

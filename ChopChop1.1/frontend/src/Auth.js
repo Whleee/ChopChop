@@ -7,7 +7,7 @@ class Auth {
       domain: 'whleeeee.auth0.com',
       audience: 'https://whleeeee.auth0.com/userinfo',
       clientID: 'cY63L8YdD0YVZ7YIF6XQgUv1weqYA6GS',
-      redirectUri: 'http://localhost:3000/callback',
+      redirectUri: 'http://localhost:8000/callback',
       responseType: 'id_token',
       scope: 'openid profile'
     });
@@ -57,7 +57,7 @@ class Auth {
 
   signOut() {
     this.auth0.logout({
-      returnTo: 'http://localhost:3000',
+      returnTo: 'http://localhost:8000',
       clientID: 'cY63L8YdD0YVZ7YIF6XQgUv1weqYA6GS',
     });
   }
