@@ -1,9 +1,7 @@
 import React from "react";
 import { Link, withRouter } from "react-router-dom";
 import auth0Client from "../Auth";
-import Favourites from "../Pages/Favourites";
-import History from "../Pages/History";
-import { Route } from "react-router-dom"
+import { Route } from "react-router-dom";
 
 const styles = {
   ChopChopHead: {
@@ -50,11 +48,33 @@ function NavBar(props) {
           <label className="mr-2 text-white" style={styles.UserInfo}>
             {auth0Client.getProfile().name}
           </label>
-          <Link className="navbar-brand" style={styles.ChopChopPages} to="/History">
-            <button className="btn btn-dark" style={styles.LogInOut}>History</button>
+          <Link
+            className="navbar-brand"
+            style={styles.ChopChopPages}
+            to="/History"
+          >
+            <button className="btn btn-dark" style={styles.LogInOut}>
+              History
+            </button>
           </Link>
-          <Link className="navbar-brand" style={styles.ChopChopPages} to="/Fav">
-            <button className="btn btn-success" style={styles.LogInOut}>Favourites</button>
+          <Link
+            className="navbar-brand"
+            style={styles.ChopChopPages}
+            to="/Favourites"
+          >
+            <button className="btn btn-success" style={styles.LogInOut}>
+              Favourites
+            </button>
+          </Link>
+
+          <Link
+            className="navbar-brand"
+            style={styles.ChopChopPages}
+            to="/Blacklist"
+          >
+            <button className="btn btn-dark" style={styles.LogInOut}>
+              Blacklist
+            </button>
           </Link>
           <button
             className="btn btn-light"

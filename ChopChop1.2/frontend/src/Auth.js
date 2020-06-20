@@ -1,15 +1,15 @@
-import auth0 from 'auth0-js';
+import auth0 from "auth0-js";
 
 class Auth {
   constructor() {
     this.auth0 = new auth0.WebAuth({
       // the following three lines MUST be updated
-      domain: 'whleeeee.auth0.com',
-      audience: 'https://whleeeee.auth0.com/userinfo',
-      clientID: 'cY63L8YdD0YVZ7YIF6XQgUv1weqYA6GS',
-      redirectUri: 'http://localhost:8000/callback',
-      responseType: 'id_token',
-      scope: 'openid profile'
+      domain: "whleeeee.auth0.com",
+      audience: "https://whleeeee.auth0.com/userinfo",
+      clientID: "cY63L8YdD0YVZ7YIF6XQgUv1weqYA6GS",
+      redirectUri: "http://localhost:8000/callback",
+      responseType: "id_token",
+      scope: "openid profile",
     });
 
     this.getProfile = this.getProfile.bind(this);
@@ -45,7 +45,7 @@ class Auth {
         this.setSession(authResult);
         resolve();
       });
-    })
+    });
   }
 
   setSession(authResult) {
@@ -57,8 +57,8 @@ class Auth {
 
   signOut() {
     this.auth0.logout({
-      returnTo: 'http://localhost:8000',
-      clientID: 'cY63L8YdD0YVZ7YIF6XQgUv1weqYA6GS',
+      returnTo: "http://localhost:8000",
+      clientID: "cY63L8YdD0YVZ7YIF6XQgUv1weqYA6GS",
     });
   }
 

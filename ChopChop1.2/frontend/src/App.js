@@ -1,17 +1,16 @@
-import React, { Component } from "react"
-import { Route, withRouter } from "react-router-dom"
-import auth0Client from "./Auth"
-import NavBar from "./NavBar/NavBar"
-import Introduction from "./Introduction/Introduction"
-import Callback from "./Callback"
-import Distance from "./Distance/Distance"
-import { Marker, GoogleApiWrapper, InfoWindow } from "google-maps-react"
-import CurrentLocation from "./Map"
-import Favourites from "./Pages/Favourites"
-import History from "./Pages/History"
-import { BrowserRouter as Router, Switch } from 'react-router-dom'
-
-
+import React, { Component } from "react";
+import { Route, withRouter } from "react-router-dom";
+import auth0Client from "./Auth";
+import NavBar from "./NavBar/NavBar";
+import Introduction from "./Introduction/Introduction";
+import Callback from "./Callback";
+import Distance from "./Distance/Distance";
+import { Marker, GoogleApiWrapper, InfoWindow } from "google-maps-react";
+import CurrentLocation from "./Map";
+import Favourites from "./Pages/Favourites";
+import History from "./Pages/History";
+import Blacklist from "./Pages/Blacklist";
+import { BrowserRouter as Router, Switch } from "react-router-dom";
 
 class App extends Component {
   constructor(props) {
@@ -63,7 +62,8 @@ class App extends Component {
         <Route exact path="/callback" component={Callback} />\
         <Route exact path="/" component={Distance} />
         <Route exact path="/History" component={History} />
-        <Route exact path="/Fav" component={Favourites} />
+        <Route exact path="/Favourites" component={Favourites} />
+        <Route exact path="/Blacklist" component={Blacklist} />
         <CurrentLocation centerAroundCurrentLocation google={this.props.google}>
           <Marker onClick={this.onMarkerClick} name={"current location"} />
           <InfoWindow
@@ -77,7 +77,6 @@ class App extends Component {
           </InfoWindow>
         </CurrentLocation>
       </div>
-      
     );
   }
 }
