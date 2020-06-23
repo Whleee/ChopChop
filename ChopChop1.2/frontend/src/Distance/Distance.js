@@ -2,6 +2,9 @@ import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
 import axios from 'axios';
 import {withRouter} from 'react-router-dom';
+import api from '../api';
+import auth0Client from "../Auth";
+import { auth } from 'firebase';
 
 const styles = {
   CardHeader: {
@@ -19,33 +22,45 @@ const styles = {
 };
 
 class Distance extends Component {
+
   constructor(props) {
     super(props);
 
     this.state = {
-        distance: '',
+        userID: '',
+        distance: ''
     };
   }
 
   async componentDidMount() {
-    const distance = (await axios.get('http://localhost:8081/')).data;
+    const distance = (await axios.get('http://localhost:8000/')).data;
     this.setState({
       distance,
     });
   }
 
   updateAnswer(value) {
+    let ID = ''
+    if (auth0Client.isAuthenticated()) {
+      ID = auth0Client.getProfile().name
+    }  
     this.setState({
+      userID: ID,
       distance: value,
     });
   }
 
-  submit() {
-    this.props.submitDistance(this.state.distance);
+  handleIncludeData = async () => {
+    const { userID, distance } = this.state
+    const payload = { userID, distance }
 
-    this.setState({
-      distance: '',
-    });
+    await api.insertData(payload).then(res => {
+        window.alert(`Data inserted successfully`)
+        this.setState({
+            userID: '',
+            distance: ''
+        })
+    })
   }
 
   render() {
@@ -64,22 +79,19 @@ class Distance extends Component {
                             <label>
                                 Maximum Distance:
                                 <input 
-                                    type = "number" 
-                                    name = "distance"  
-                                    placeholder = " Enter here!"
+                                    type = "text"
+                                    name = "distance"  
+                                    placeholder = "Enter here!"
                                     onChange={(e) => {this.updateAnswer(e.target.value)}}
                                 /> 
                             </label>
                             <button
                                 className="btn btn-warning"
                                 style = {styles.CardBody}
-                                onClick={() => {this.submit()}}>
+                                onClick= {(e) => {e.preventDefault(); this.handleIncludeData()}}>
                                 Submit
                             </button>
                         </form>
-                        {
-                            this.props.distance
-                        }
                     </div>
                   </div>
               </div>
@@ -88,4 +100,4 @@ class Distance extends Component {
   }
 }
 
-export default withRouter(Distance);
+export default Distance;

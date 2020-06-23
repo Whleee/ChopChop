@@ -4,7 +4,7 @@ const Schema = mongoose.Schema
 const Data = new Schema(
     {
         userID: { type: String, required: false },
-        maxDistance: { type: String, required: true },
+        distance: { type: String, required: true },
     },
     { timestamps: true },
 )
