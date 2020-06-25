@@ -7,6 +7,7 @@ const mapStyles = {
     marginLeft: "263px",
     width: "50%",
     height: "50%",
+    marginTop: "20px"
   },
 };
 

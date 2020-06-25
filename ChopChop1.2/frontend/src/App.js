@@ -11,6 +11,7 @@ import Favourites from "./Pages/Favourites";
 import History from "./Pages/History";
 import Blacklist from "./Pages/Blacklist";
 import { BrowserRouter as Router, Switch } from "react-router-dom";
+import LocationSearchInput from "./LocationSearchInput";
 
 class App extends Component {
   constructor(props) {
@@ -76,6 +77,8 @@ class App extends Component {
             </div>
           </InfoWindow>
         </CurrentLocation>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDPKvgOhMorW7BVV6O9Z597wYb7L7p9Tcw&libraries=places"></script>
+        <LocationSearchInput/>
       </div>
     );
   }

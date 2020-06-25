@@ -36,7 +36,7 @@ class Introduction extends Component {
   render() {
     return (
       <div className="container">
-        <div className="row" style = {{paddingTop: '120px'}}>
+        <div className="row" style = {{paddingTop: '60px'}}>
             <div className="card text-white bg-info mb-3">
               <div className="card-header" style = {styles.CardHeader}>
                 Finding what to do FAST.

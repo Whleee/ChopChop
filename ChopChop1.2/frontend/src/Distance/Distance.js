@@ -66,7 +66,7 @@ class Distance extends Component {
   render() {
     return (
       <div className="container">
-        <div className="row" style = {{paddingTop: '10px'}}>
+        <div className="row" style = {{paddingTop: '0px'}}>
             <div className="card text-white bg-success mb-3">
               <div className="card-header" style = {styles.CardHeader}>
                 How far do you want to go?
