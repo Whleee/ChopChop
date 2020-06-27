@@ -65,7 +65,7 @@ class App extends Component {
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDPKvgOhMorW7BVV6O9Z597wYb7L7p9Tcw&libraries=places" />
         <NavBar />
         <Route exact path="/" component={Introduction} />
-        <Route exact path="/callback" component={Callback} />\
+        <Route exact path="/callback" component={Callback} />
         <Route exact path="/" component={Distance} />
         <Route exact path="/History" component={History} />
         <Route exact path="/Favourites" component={Favourites} />

@@ -99,7 +99,7 @@ class History extends Component {
     }
 
     return (
-      <div style={{ paddingTop: "160px" }}>
+      <div style={{ paddingTop: "180px" }}>
         <Link to="./">Back to Home</Link>
         <div id="wrapper">
           <header>

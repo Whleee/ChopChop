@@ -11,7 +11,7 @@ import App from "../App2";
 
 const styles = {
   Positioner: {
-    paddingTop: "120px"
+    paddingTop: "140px"
   }
 }
 
