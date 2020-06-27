@@ -1,5 +1,7 @@
+/*global google*/
 import React from "react";
 import ReactDOM from "react-dom";
+import { Marker, GoogleApiWrapper, InfoWindow } from "google-maps-react";
 
 const mapStyles = {
   map: {
@@ -7,7 +9,7 @@ const mapStyles = {
     marginLeft: "263px",
     width: "50%",
     height: "50%",
-    marginTop: "20px"
+    marginTop: "20px",
   },
 };
 

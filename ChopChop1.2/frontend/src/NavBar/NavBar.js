@@ -51,6 +51,13 @@ function NavBar(props) {
           <Link
             className="navbar-brand"
             style={styles.ChopChopPages}
+            to="/testpage"
+          >
+            testpage
+          </Link>
+          <Link
+            className="navbar-brand"
+            style={styles.ChopChopPages}
             to="/History"
           >
             <button className="btn btn-dark" style={styles.LogInOut}>
