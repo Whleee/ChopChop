@@ -71,6 +71,7 @@ class App extends Component {
         <Route exact path="/Favourites" component={Favourites} />
         <Route exact path="/Blacklist" component={Blacklist} />
         <Route exact path="/testpage" component={App2} />
+        {/*
         <CurrentLocation centerAroundCurrentLocation google={this.props.google}>
           <Marker onClick={this.onMarkerClick} name={"current location"} />
           <InfoWindow
@@ -84,6 +85,7 @@ class App extends Component {
           </InfoWindow>
         </CurrentLocation>
         <LocationSearchInput />
+      */}
       </div>
     );
   }

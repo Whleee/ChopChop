@@ -67,11 +67,12 @@ class Distance extends Component {
     return (
       <div className="container">
         <div className="row" style = {{paddingTop: '0px'}}>
-            <div className="card text-white bg-success mb-3">
+            <div className="card text-black bg-warning mb-3">
               <div className="card-header" style = {styles.CardHeader}>
-                How far do you want to go?
+                Click on Search to begin!
               </div>
             </div>
+            {/*
                 <div className="card text-white bg-success mb-3" style = {styles.CardBody}>
                     <div className="card-header">Distance: </div>
                     <div className="card-body">
@@ -94,6 +95,7 @@ class Distance extends Component {
                         </form>
                     </div>
                   </div>
+            */}
               </div>
         </div>
     )

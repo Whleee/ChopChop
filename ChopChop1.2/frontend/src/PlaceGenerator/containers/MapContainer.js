@@ -9,6 +9,12 @@ import ConstraintSlider from "../components/ConstraintSlider";
 import { Button, Input, Divider, message } from "antd";
 import App from "../App2";
 
+const styles = {
+  Positioner: {
+    paddingTop: "120px"
+  }
+}
+
 const SG_COOR = { lat: 1.3521, lng: 103.8198 };
 
 class MapsContainer extends Component {
@@ -216,7 +222,7 @@ class MapsContainer extends Component {
     } = this.state;
     const { autoCompleteService, geoCoderService } = this.state; // Google Maps Services
     return (
-      <div className="w-100 d-flex py-4 flex-wrap justify-content-center">
+      <div className="w-100 d-flex flex-wrap justify-content-center" style={styles.Positioner}>
         <h1 className="w-100 fw-md">Find something to do!</h1>
         {/* Constraints section */}
 

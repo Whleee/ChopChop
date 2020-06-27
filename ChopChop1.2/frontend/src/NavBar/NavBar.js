@@ -21,6 +21,15 @@ const styles = {
     fontWeight: "bold",
     fontFamily: "Courier New",
   },
+
+  ButtonPosition: {
+    paddingLeft: "30px"
+  },
+
+  ButtonPositionEnd: {
+    paddingLeft: "30px",
+    paddingRight: "30px"
+  }
 };
 
 function NavBar(props) {
@@ -50,33 +59,35 @@ function NavBar(props) {
           </label>
           <Link
             className="navbar-brand"
-            style={styles.ChopChopPages}
+            style={styles.ButtonPosition}
             to="/testpage"
           >
-            testpage
+            <button className="btn btn-warning" style={styles.LogInOut}>
+            Search
+            </button>
           </Link>
           <Link
             className="navbar-brand"
-            style={styles.ChopChopPages}
+            style={styles.ButtonPosition}
             to="/History"
           >
-            <button className="btn btn-dark" style={styles.LogInOut}>
+            <button className="btn btn-light" style={styles.LogInOut}>
               History
             </button>
           </Link>
           <Link
             className="navbar-brand"
-            style={styles.ChopChopPages}
+            style={styles.ButtonPosition}
             to="/Favourites"
           >
-            <button className="btn btn-success" style={styles.LogInOut}>
+            <button className="btn btn-light" style={styles.LogInOut}>
               Favourites
             </button>
           </Link>
 
           <Link
             className="navbar-brand"
-            style={styles.ChopChopPages}
+            style={styles.ButtonPositionEnd}
             to="/Blacklist"
           >
             <button className="btn btn-dark" style={styles.LogInOut}>
@@ -84,7 +95,7 @@ function NavBar(props) {
             </button>
           </Link>
           <button
-            className="btn btn-light"
+            className="btn btn-info"
             style={styles.LogInOut}
             onClick={() => {
               signOut();

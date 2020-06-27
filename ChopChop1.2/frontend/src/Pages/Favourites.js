@@ -99,7 +99,7 @@ class Favourites extends Component {
     }
 
     return (
-      <div style={{ paddingTop: "40px" }}>
+      <div style={{ paddingTop: "160px" }}>
         <Link to="./">Back to Home</Link>
         <div id="wrapper">
           <header>
