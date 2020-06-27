@@ -8,6 +8,7 @@ const styles = {
     fontSize: "65px",
     fontWeight: "bold",
     fontFamily: "Courier New",
+    margin: "auto"
   },
 
   LogInOut: {
