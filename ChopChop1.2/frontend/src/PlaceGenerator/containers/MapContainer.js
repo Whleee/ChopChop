@@ -131,7 +131,7 @@ class MapsContainer extends Component {
     // First, search for ice cream shops.
     placesService.textSearch(placesRequest, (response) => {
       // Only look at the nearest top 5.
-      const responseLimit = Math.min(5, response.length);
+      const responseLimit = Math.min(50, response.length);
       for (let i = 0; i < responseLimit; i++) {
         const placeCoords = {
           lat: response[i].geometry.location.lat,
@@ -294,9 +294,12 @@ class MapsContainer extends Component {
               <div className="d-flex flex-column justify-content-center">
                 <h1 className="mb-4 fw-md">Heres what we found...</h1>
                 <div className="d-flex flex-wrap">
+                  {/* 
                   {searchResults.map((result, key) => (
                     <PlaceCard info={result} key={key} />
                   ))}
+                  */}
+                  <PlaceCard info={searchResults[Math.floor(Math.random() * searchResults.length)]}/>
                 </div>
               </div>
             </section>
