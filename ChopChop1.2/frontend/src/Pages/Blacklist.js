@@ -91,6 +91,22 @@ class Blacklist extends Component {
         });
     }
 
+    function realTimeDisplay() {
+      db.collection("Blacklist").onSnapshot((snapshot) => {
+        let changes = snapshot.docChanges();
+        changes.forEach((change) => {
+          if (change.type == "added") {
+            renderPlace(change.doc);
+          } else if (change.type == "removed") {
+            const list = document.querySelector("#book-list ul");
+            let li = list.querySelector("[data-id=" + change.doc.id + "]");
+
+            list.removeChild(li);
+          }
+        });
+      });
+    }
+
     function handleDelete() {
       let id = this.parentElement.getAttribute("data-id");
       db.collection("Blacklist")
@@ -116,7 +132,7 @@ class Blacklist extends Component {
           </header>
           <div id="book-list">
             <h2 class="title">Recently Blacklisted:</h2>
-            <ul>{display()}</ul>
+            <ul>{realTimeDisplay()}</ul>
           </div>
           <form id="add-cat">
             <select id="category-list">

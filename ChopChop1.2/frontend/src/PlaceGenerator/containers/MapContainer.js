@@ -4,6 +4,8 @@ import MapAutoComplete from "../components/MapAutoComplete";
 import MapMarker from "../components/MapMarker";
 import PlaceCard from "../components/PlaceCard";
 import ConstraintSlider from "../components/ConstraintSlider";
+import ReactDOM from "react-dom";
+import firebase from "../../firebase";
 //import "../App.css";
 
 import { Button, Input, Divider, message } from "antd";
@@ -11,11 +13,13 @@ import App from "../App2";
 
 const styles = {
   Positioner: {
-    paddingTop: "140px"
-  }
-}
+    paddingTop: "140px",
+  },
+};
 
 const SG_COOR = { lat: 1.3521, lng: 103.8198 };
+
+const db = firebase.firestore();
 
 class MapsContainer extends Component {
   constructor(props) {
@@ -37,6 +41,8 @@ class MapsContainer extends Component {
         lng: 103.8198,
       },
       listOfCoords: [],
+      retry: false,
+      fav: false,
     };
   }
 
@@ -211,6 +217,25 @@ class MapsContainer extends Component {
     }
   };
 
+  handleRetryClicked = () => {
+    this.setState({
+      retry: true,
+    });
+  };
+
+  //storing data
+  handleStore = (place) => {
+    //place.preventDefault();
+
+    const forms = document.forms;
+    const catForm = forms["test"];
+
+    db.collection("Favourites").add({
+      name: place.name,
+      category: catForm.querySelector('input[type = "text"]').value,
+    });
+  };
+
   render() {
     const {
       constraints,
@@ -221,8 +246,15 @@ class MapsContainer extends Component {
       listOfCoords,
     } = this.state;
     const { autoCompleteService, geoCoderService } = this.state; // Google Maps Services
+
+    const generatedPlace =
+      searchResults[Math.floor(Math.random() * searchResults.length)];
+
     return (
-      <div className="w-100 d-flex flex-wrap justify-content-center" style={styles.Positioner}>
+      <div
+        className="w-100 d-flex flex-wrap justify-content-center"
+        style={styles.Positioner}
+      >
         <h1 className="w-100 fw-md">Find something to do!</h1>
         {/* Constraints section */}
 
@@ -299,7 +331,24 @@ class MapsContainer extends Component {
                     <PlaceCard info={result} key={key} />
                   ))}
                   */}
-                  <PlaceCard info={searchResults[Math.floor(Math.random() * searchResults.length)]}/>
+                  {!this.state.retry ? (
+                    <PlaceCard id="result" info={generatedPlace} />
+                  ) : (
+                    <PlaceCard id="result" info={generatedPlace} />
+                  )}
+                  <button className="btns" onClick={this.handleRetryClicked}>
+                    Try Again
+                  </button>
+                  <button className="btns">Take me there!</button>
+                  <button
+                    className="btns"
+                    onClick={this.handleStore(generatedPlace)}
+                  >
+                    Add to Favourites
+                  </button>
+                  <button className="btns" onClick={this.handleRetryClicked}>
+                    Add to Blacklist
+                  </button>
                 </div>
               </div>
             </section>

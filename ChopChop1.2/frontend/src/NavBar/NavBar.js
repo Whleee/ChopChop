@@ -8,7 +8,7 @@ const styles = {
     fontSize: "65px",
     fontWeight: "bold",
     fontFamily: "Courier New",
-    margin: "auto"
+    margin: "auto",
   },
 
   LogInOut: {
@@ -24,13 +24,13 @@ const styles = {
   },
 
   ButtonPosition: {
-    paddingLeft: "30px"
+    paddingLeft: "30px",
   },
 
   ButtonPositionEnd: {
     paddingLeft: "30px",
-    paddingRight: "30px"
-  }
+    paddingRight: "30px",
+  },
 };
 
 function NavBar(props) {
@@ -43,6 +43,15 @@ function NavBar(props) {
     <nav className="navbar navbar-dark bg-info fixed-top">
       <Link className="navbar-brand" style={styles.ChopChopHead} to="/">
         ChopChop
+      </Link>
+      <Link
+        className="navbar-brand"
+        style={styles.ButtonPosition}
+        to="/testpage"
+      >
+        <button className="btn btn-warning" style={styles.LogInOut}>
+          Search
+        </button>
       </Link>
       {!auth0Client.isAuthenticated() && (
         <button
@@ -64,7 +73,7 @@ function NavBar(props) {
             to="/testpage"
           >
             <button className="btn btn-warning" style={styles.LogInOut}>
-            Search
+              Search
             </button>
           </Link>
           <Link

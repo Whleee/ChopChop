@@ -54,6 +54,10 @@
 .col-12 {
   padding: 200px;
 }
+.btns {
+  height: 20%;
+  margin-top: 300px;
+}
 
 .image-wrapper-sm {
   object-fit: cover;
