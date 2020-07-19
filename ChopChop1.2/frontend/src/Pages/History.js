@@ -81,16 +81,6 @@ class History extends Component {
       placeList.appendChild(li);
     }
 
-    function display() {
-      db.collection("History")
-        .get()
-        .then((snapshot) => {
-          snapshot.docs.forEach((doc) => {
-            renderPlace(doc);
-          });
-        });
-    }
-
     function realTimeDisplay() {
       db.collection("History").onSnapshot((snapshot) => {
         let changes = snapshot.docChanges();

@@ -81,16 +81,6 @@ class Favourites extends Component {
       placeList.appendChild(li);
     }
 
-    function display() {
-      db.collection("Favourites")
-        .get()
-        .then((snapshot) => {
-          snapshot.docs.forEach((doc) => {
-            renderPlace(doc);
-          });
-        });
-    }
-
     function realTimeDisplay() {
       db.collection("Favourites").onSnapshot((snapshot) => {
         let changes = snapshot.docChanges();

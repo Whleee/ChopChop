@@ -81,16 +81,6 @@ class Blacklist extends Component {
       placeList.appendChild(li);
     }
 
-    function display() {
-      db.collection("Blacklist")
-        .get()
-        .then((snapshot) => {
-          snapshot.docs.forEach((doc) => {
-            renderPlace(doc);
-          });
-        });
-    }
-
     function realTimeDisplay() {
       db.collection("Blacklist").onSnapshot((snapshot) => {
         let changes = snapshot.docChanges();

@@ -6,6 +6,7 @@ import PlaceCard from "../components/PlaceCard";
 import ConstraintSlider from "../components/ConstraintSlider";
 import ReactDOM from "react-dom";
 import firebase from "../../firebase";
+import { BrowserRouter as Router, Redirect } from "react-router-dom";
 //import "../App.css";
 
 import { Button, Input, Divider, message } from "antd";
@@ -42,8 +43,24 @@ class MapsContainer extends Component {
       },
       listOfCoords: [],
       retry: false,
-      fav: false,
+      number: 0,
+      car: false,
+      walk: false,
     };
+  }
+
+  componentDidMount() {
+    if (navigator && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        const coords = pos.coords;
+        this.setState({
+          currentLocation: {
+            lat: coords.latitude,
+            lng: coords.longitude,
+          },
+        });
+      });
+    }
   }
 
   // Update name for constraint with index === key
@@ -95,7 +112,10 @@ class MapsContainer extends Component {
       mapsLoaded: true,
       map,
       mapsApi,
-      singaporeLatLng: new mapsApi.LatLng(SG_COOR.lat, SG_COOR.lng),
+      singaporeLatLng: new mapsApi.LatLng(
+        this.state.currentLocation.lat,
+        this.state.currentLocation.lng
+      ),
       autoCompleteService: new mapsApi.places.AutocompleteService(),
       placesService: new mapsApi.places.PlacesService(map),
       geoCoderService: new mapsApi.Geocoder(),
@@ -137,20 +157,13 @@ class MapsContainer extends Component {
     // First, search for ice cream shops.
     placesService.textSearch(placesRequest, (response) => {
       // Only look at the nearest top 5.
-      const responseLimit = Math.min(50, response.length);
+      const responseLimit = Math.min(10, response.length);
       for (let i = 0; i < responseLimit; i++) {
-        const placeCoords = {
-          lat: response[i].geometry.location.lat,
-          lng: response[i].geometry.location.lng,
-        };
-        console.log(placeCoords);
-        const prevList = this.state.listOfCoords;
-        prevList.push(placeCoords);
-        this.setState({
-          listOfCoords: prevList,
-        });
-
         const iceCreamPlace = response[i];
+        const coords = {
+          lat: iceCreamPlace.geometry.location.lat,
+          lng: iceCreamPlace.geometry.location.lng,
+        };
         const { rating, name } = iceCreamPlace;
         const address = iceCreamPlace.formatted_address; // e.g 80 mandai Lake Rd,
         const priceLevel = iceCreamPlace.price_level; // 1, 2, 3...
@@ -169,58 +182,83 @@ class MapsContainer extends Component {
           destination: address, // Address of ice cream place
           travelMode: "DRIVING",
         };
-        directionService.route(directionRequest, (result, status) => {
-          if (status !== "OK") {
-            return;
-          }
-          const travellingRoute = result.routes[0].legs[0]; // { duration: { text: 1mins, value: 600 } }
-          const travellingTimeInMinutes = travellingRoute.duration.value / 60;
-          if (travellingTimeInMinutes < timeLimit) {
-            const distanceText = travellingRoute.distance.text; // 6.4km
-            const timeText = travellingRoute.duration.text; // 11 mins
-            filteredResults.push({
-              name,
-              rating,
-              address,
-              openNow,
-              priceLevel,
-              photoUrl,
-              distanceText,
-              timeText,
-            });
-          }
-          // Finally, Add results to state
-          this.setState({ searchResults: filteredResults });
-        });
+
+        const directionRequest2 = {
+          origin: markerLatLng,
+          destination: address, // Address of ice cream place
+          travelMode: "WALKING",
+        };
+
+        if (this.state.car) {
+          directionService.route(directionRequest, (result, status) => {
+            if (status !== "OK") {
+              return;
+            }
+            const travellingRoute = result.routes[0].legs[0]; // { duration: { text: 1mins, value: 600 } }
+            const travellingTimeInMinutes = travellingRoute.duration.value / 60;
+            if (travellingTimeInMinutes < timeLimit) {
+              const distanceText = travellingRoute.distance.text; // 6.4km
+              const timeText = travellingRoute.duration.text; // 11 mins
+              filteredResults.push({
+                name,
+                rating,
+                address,
+                openNow,
+                priceLevel,
+                photoUrl,
+                distanceText,
+                timeText,
+                coords,
+              });
+            }
+            // Finally, Add results to state
+            this.setState({ searchResults: filteredResults });
+          });
+        } else if (this.state.walk) {
+          directionService.route(directionRequest2, (result, status) => {
+            if (status !== "OK") {
+              return;
+            }
+            const travellingRoute = result.routes[0].legs[0]; // { duration: { text: 1mins, value: 600 } }
+            const travellingTimeInMinutes = travellingRoute.duration.value / 60;
+            if (travellingTimeInMinutes < timeLimit) {
+              const distanceText = travellingRoute.distance.text; // 6.4km
+              const timeText = travellingRoute.duration.text; // 11 mins
+              filteredResults.push({
+                name,
+                rating,
+                address,
+                openNow,
+                priceLevel,
+                photoUrl,
+                distanceText,
+                timeText,
+                coords,
+              });
+            }
+            // Finally, Add results to state
+            this.setState({ searchResults: filteredResults });
+          });
+        }
       }
     });
   };
 
-  //sub function
-  fun1 = (position) => {
-    this.setState({
-      currentLocation: {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude,
-      },
-    });
-    console.log("Latitude is :", position.coords.latitude);
-    console.log("Longitude is :", position.coords.longitude);
-  };
-
-  //get users location
-  componentDidMount = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(this.fun1, function(error) {
-        console.error("Error code = " + error.code + " - " + error.message);
+  handleRetryClicked = () => {
+    const searchResults = this.state.searchResults;
+    const limit = searchResults.length;
+    const currNumber = this.state.number;
+    if (currNumber == limit - 1) {
+      this.setState({
+        retry: true,
+        number: 0,
+      });
+    } else {
+      this.setState({
+        retry: true,
+        number: this.state.number + 1,
       });
     }
-  };
-
-  handleRetryClicked = () => {
-    this.setState({
-      retry: true,
-    });
   };
 
   //storing data
@@ -236,6 +274,20 @@ class MapsContainer extends Component {
     });
   };
 
+  handleCarClicked = () => {
+    this.setState({
+      car: true,
+      walk: false,
+    });
+  };
+
+  handleWalkClicked = () => {
+    this.setState({
+      walk: true,
+      car: false,
+    });
+  };
+
   render() {
     const {
       constraints,
@@ -244,11 +296,12 @@ class MapsContainer extends Component {
       markers,
       searchResults,
       listOfCoords,
+      place,
+      number,
+      car,
+      walk,
     } = this.state;
     const { autoCompleteService, geoCoderService } = this.state; // Google Maps Services
-
-    const generatedPlace =
-      searchResults[Math.floor(Math.random() * searchResults.length)];
 
     return (
       <div
@@ -257,9 +310,14 @@ class MapsContainer extends Component {
       >
         <h1 className="w-100 fw-md">Find something to do!</h1>
         {/* Constraints section */}
+        <div>
+          <h2 className="w-100 fw-md">Choose your mode of transport!</h2>
+          <button onClick={this.handleCarClicked}>Car</button>
+          <button onClick={this.handleWalkClicked}>Walk</button>
+        </div>
 
         <section className="col-4">
-          {mapsLoaded ? (
+          {mapsLoaded && car ? (
             <div>
               {constraints.map((constraint, key) => {
                 const { name, time } = constraint;
@@ -277,6 +335,41 @@ class MapsContainer extends Component {
                         this.updateConstraintTime(key, value)
                       }
                       text="Minutes away by car"
+                    />
+                    {/* Search Button */}
+                    <Button
+                      className="mt-4 fw-md"
+                      type="primary"
+                      size="large"
+                      onClick={this.handleSearch}
+                    >
+                      Search!
+                    </Button>
+                    <Divider />
+                  </div>
+                );
+              })}
+            </div>
+          ) : null}
+
+          {mapsLoaded && walk ? (
+            <div>
+              {constraints.map((constraint, key) => {
+                const { name, time } = constraint;
+                return (
+                  <div key={key} className="mb-4">
+                    <div className="d-flex mb-2">
+                      <form id="test">
+                        <Input type="text" placeholder="Category" />
+                      </form>
+                    </div>
+                    <ConstraintSlider
+                      iconType=""
+                      value={time}
+                      onChange={(value) =>
+                        this.updateConstraintTime(key, value)
+                      }
+                      text="Minutes away by walking"
                     />
                     {/* Search Button */}
                     <Button
@@ -332,20 +425,30 @@ class MapsContainer extends Component {
                   ))}
                   */}
                   {!this.state.retry ? (
-                    <PlaceCard id="result" info={generatedPlace} />
+                    <PlaceCard id="result" info={searchResults[number]} />
                   ) : (
-                    <PlaceCard id="result" info={generatedPlace} />
+                    <PlaceCard id="result" info={searchResults[number]} />
                   )}
                   <button className="btns" onClick={this.handleRetryClicked}>
                     Try Again
                   </button>
-                  <button className="btns">Take me there!</button>
-                  <button
+                  <a
                     className="btns"
-                    onClick={this.handleStore(generatedPlace)}
+                    target="_blank"
+                    href={
+                      "https://google.com/maps/dir/" +
+                      this.state.currentLocation.lat +
+                      "," +
+                      this.state.currentLocation.lng +
+                      "/" +
+                      searchResults[number].address +
+                      "/"
+                    }
                   >
-                    Add to Favourites
-                  </button>
+                    <button>Take me there!</button>
+                  </a>
+
+                  <button className="btns" onClick ={}>Add to Favourites</button>
                   <button className="btns" onClick={this.handleRetryClicked}>
                     Add to Blacklist
                   </button>
