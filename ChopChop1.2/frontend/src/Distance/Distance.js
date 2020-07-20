@@ -11,6 +11,7 @@ const styles = {
     fontSize: '50px',
     fontWeight: 'bold',
     fontFamily: 'Courier New',
+    color: "black",
   },
 
   CardBody: {
@@ -72,30 +73,6 @@ class Distance extends Component {
                 Click on Search to begin!
               </div>
             </div>
-            {/*
-                <div className="card text-white bg-success mb-3" style = {styles.CardBody}>
-                    <div className="card-header">Distance: </div>
-                    <div className="card-body">
-                        <form>
-                            <label>
-                                Maximum Distance:
-                                <input 
-                                    type = "text"
-                                    name = "distance"  
-                                    placeholder = "Enter here!"
-                                    onChange={(e) => {this.updateAnswer(e.target.value)}}
-                                /> 
-                            </label>
-                            <button
-                                className="btn btn-warning"
-                                style = {styles.CardBody}
-                                onClick= {(e) => {e.preventDefault(); this.handleIncludeData()}}>
-                                Submit
-                            </button>
-                        </form>
-                    </div>
-                  </div>
-            */}
               </div>
         </div>
     )

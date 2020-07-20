@@ -14,8 +14,98 @@ import App from "../App2";
 
 const styles = {
   Positioner: {
-    paddingTop: "140px",
+    paddingTop: "160px",
   },
+
+  ChopChopHead: {
+    fontSize: "65px",
+    fontWeight: "bold",
+    fontFamily: "Courier New",
+    margin: "auto",
+  },
+
+  LogInOut: {
+    fontSize: "40px",
+    fontWeight: "bold",
+    fontFamily: "Courier New",
+  },
+
+  UserInfo: {
+    fontSize: "40px",
+    fontWeight: "bold",
+    fontFamily: "Courier New",
+  },
+
+  ButtonPosition: {
+    paddingLeft: "30px",
+  },
+
+  ButtonPositionEnd: {
+    paddingLeft: "30px",
+    paddingRight: "30px",
+  },
+
+  ButtonPositionOut: {
+    paddingLeft: "100px",
+    fontSize: "40px",
+    fontWeight: "bold",
+    fontFamily: "Courier New",
+  },
+
+  LogInOut2: {
+    fontSize: "40px",
+    fontWeight: "bold",
+    fontFamily: "Courier New",
+    paddingTop: "15px",
+    paddingLeft: "50px",
+  },
+
+  CardHeader: {
+    fontSize: '50px',
+    fontWeight: "bold",
+    fontFamily: 'Courier New',
+    color: "black",
+  },
+
+  CardBody: {
+    fontSize: '30px',
+    fontFamily: 'Courier New',
+    fontWeight: 'bold',
+    color: 'black',
+  },
+
+  FormBody: {
+    fontSize: "30px",
+    fontWeight: "bold",
+    fontFamily: "Courier New",
+  },
+  
+  ButtonPositioner: {
+    paddingLeft: "50px",
+  },
+
+  SearchButton: {
+    fontSize: "40px",
+    fontWeight: "bold",
+    fontFamily: "Courier New",
+    padding: "10px 90px"
+  },
+
+  CardHeader2: {
+    fontSize: '50px',
+    fontWeight: "bold",
+    fontFamily: 'Courier New',
+    color: "black",
+    paddingLeft: "25%"
+  },
+
+  Results: {
+    fontSize: '25px',
+    fontWeight: "bold",
+    fontFamily: 'Courier New',
+    color: "black",
+    paddingLeft: "25%"
+  }
 };
 
 const SG_COOR = { lat: 1.3521, lng: 103.8198 };
@@ -305,15 +395,20 @@ class MapsContainer extends Component {
 
     return (
       <div
-        className="w-100 d-flex flex-wrap justify-content-center"
+        className=""
         style={styles.Positioner}
       >
-        <h1 className="w-100 fw-md">Find something to do!</h1>
+        <div className="d-flex flex-wrap justify-content-center">
+        <div className="card-header bg-warning" style={styles.CardHeader}>Find something to do!</div>
         {/* Constraints section */}
         <div>
-          <h2 className="w-100 fw-md">Choose your mode of transport!</h2>
-          <button onClick={this.handleCarClicked}>Car</button>
-          <button onClick={this.handleWalkClicked}>Walk</button>
+          <h2 className="fw-md" style={styles.LogInOut2}>Choose your mode of transport!</h2>
+          <button className=" w-50 btn btn-dark" style={styles.LogInOut} onClick={this.handleCarClicked}>
+            Car
+          </button>
+          <button className="w-50 btn btn-success" style={styles.LogInOut} onClick={this.handleWalkClicked}>
+            Walk
+          </button>
         </div>
 
         <section className="col-4">
@@ -322,10 +417,10 @@ class MapsContainer extends Component {
               {constraints.map((constraint, key) => {
                 const { name, time } = constraint;
                 return (
-                  <div key={key} className="mb-4">
-                    <div className="d-flex mb-2">
-                      <form id="test">
-                        <Input type="text" placeholder="Category" />
+                  <div key={key} className="mb-3" style={styles.LogInOut}>
+                    <div className="mb-2">
+                      <form id="test" stlye={styles.LogInOut}>
+                        <Input type="text" placeholder="Category" style={styles.FormBody}/>
                       </form>
                     </div>
                     <ConstraintSlider
@@ -337,14 +432,13 @@ class MapsContainer extends Component {
                       text="Minutes away by car"
                     />
                     {/* Search Button */}
-                    <Button
-                      className="mt-4 fw-md"
-                      type="primary"
-                      size="large"
+                    <button
+                      className="btn btn-warning"
                       onClick={this.handleSearch}
+                      style={styles.SearchButton}
                     >
                       Search!
-                    </Button>
+                    </button>
                     <Divider />
                   </div>
                 );
@@ -357,14 +451,14 @@ class MapsContainer extends Component {
               {constraints.map((constraint, key) => {
                 const { name, time } = constraint;
                 return (
-                  <div key={key} className="mb-4">
+                  <div key={key} className="mb-3" style={styles.LogInOut}>
                     <div className="d-flex mb-2">
-                      <form id="test">
-                        <Input type="text" placeholder="Category" />
+                      <form id="test" style={styles.LogInOut}>
+                        <Input type="text" placeholder="Category" style={styles.FormBody}/>
                       </form>
                     </div>
                     <ConstraintSlider
-                      iconType=""
+                      iconType="heart"
                       value={time}
                       onChange={(value) =>
                         this.updateConstraintTime(key, value)
@@ -372,14 +466,13 @@ class MapsContainer extends Component {
                       text="Minutes away by walking"
                     />
                     {/* Search Button */}
-                    <Button
-                      className="mt-4 fw-md"
-                      type="primary"
-                      size="large"
+                    <button
+                      className="btn btn-warning" 
+                      style={styles.SearchButton}       
                       onClick={this.handleSearch}
                     >
                       Search!
-                    </Button>
+                    </button>
                     <Divider />
                   </div>
                 );
@@ -389,7 +482,7 @@ class MapsContainer extends Component {
         </section>
 
         {/* Maps Section */}
-        <section className="col-8 h-lg">
+        <section className="col-10 h-lg" style={{paddingBottom: "50px"}}>
           <GoogleMapReact
             bootstrapURLKeys={{
               key: "AIzaSyBQlZDHkXFuTFhDdgn8T286dkWQije7d80",
@@ -410,14 +503,15 @@ class MapsContainer extends Component {
             />
           </GoogleMapReact>
         </section>
+        </div>
 
         {/* Results section */}
         {searchResults.length > 0 ? (
           <>
             <Divider />
-            <section className="col-12">
-              <div className="d-flex flex-column justify-content-center">
-                <h1 className="mb-4 fw-md">Heres what we found...</h1>
+            <section>
+              <div>
+              <div className="card-header bg-warning" style={styles.CardHeader2}>Here's where to go!</div>
                 <div className="d-flex flex-wrap">
                   {/* 
                   {searchResults.map((result, key) => (
@@ -425,11 +519,11 @@ class MapsContainer extends Component {
                   ))}
                   */}
                   {!this.state.retry ? (
-                    <PlaceCard id="result" info={searchResults[number]} />
-                  ) : (
+                     <PlaceCard id="result" info={searchResults[number]} />
+                    ) : (
                     <PlaceCard id="result" info={searchResults[number]} />
                   )}
-                  <button className="btns" onClick={this.handleRetryClicked}>
+                  <button className="btns mb-5" style={styles.LogInOut} onClick={this.handleRetryClicked}>
                     Try Again
                   </button>
                   <a
@@ -445,11 +539,11 @@ class MapsContainer extends Component {
                       "/"
                     }
                   >
-                    <button>Take me there!</button>
+                    <button style={styles.LogInOut}>Take me there!</button>
                   </a>
 
-                  <button className="btns" onClick ={}>Add to Favourites</button>
-                  <button className="btns" onClick={this.handleRetryClicked}>
+                
+                  <button className="btns" style={styles.LogInOut} onClick={this.handleRetryClicked}>
                     Add to Blacklist
                   </button>
                 </div>

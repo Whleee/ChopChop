@@ -12,13 +12,13 @@ const styles = {
   },
 
   LogInOut: {
-    fontSize: "35px",
+    fontSize: "40px",
     fontWeight: "bold",
     fontFamily: "Courier New",
   },
 
   UserInfo: {
-    fontSize: "30px",
+    fontSize: "40px",
     fontWeight: "bold",
     fontFamily: "Courier New",
   },
@@ -30,6 +30,13 @@ const styles = {
   ButtonPositionEnd: {
     paddingLeft: "30px",
     paddingRight: "30px",
+  },
+
+  ButtonPositionOut: {
+    paddingLeft: "100px",
+    fontSize: "40px",
+    fontWeight: "bold",
+    fontFamily: "Courier New",
   },
 };
 
@@ -44,23 +51,25 @@ function NavBar(props) {
       <Link className="navbar-brand" style={styles.ChopChopHead} to="/">
         ChopChop
       </Link>
-      <Link
-        className="navbar-brand"
-        style={styles.ButtonPosition}
-        to="/testpage"
-      >
-        <button className="btn btn-warning" style={styles.LogInOut}>
-          Search
-        </button>
-      </Link>
       {!auth0Client.isAuthenticated() && (
-        <button
-          className="btn btn-light"
-          style={styles.LogInOut}
-          onClick={auth0Client.signIn}
-        >
-          Sign In
-        </button>
+        <div>
+          <Link
+            className="navbar-brand"
+            style={styles.ButtonPosition}
+            to="/testpage"
+          >
+            <button className="btn btn-warning" style={styles.LogInOut}>
+            Search
+            </button>
+          </Link>
+          <button
+            className="btn btn-light"
+            style={styles.LogInOut}
+            onClick={auth0Client.signIn}
+          >
+            Sign In
+          </button>
+        </div>
       )}
       {auth0Client.isAuthenticated() && (
         <div>
@@ -104,7 +113,7 @@ function NavBar(props) {
               Blacklist
             </button>
           </Link>
-          <button
+          <button style={styles.ButtonPositionOut}
             className="btn btn-info"
             style={styles.LogInOut}
             onClick={() => {

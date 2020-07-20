@@ -5,6 +5,49 @@ import firebase from "../firebase";
 
 const db = firebase.firestore();
 
+const styles = {
+  ChopChopHead: {
+    fontSize: "65px",
+    fontWeight: "bold",
+    fontFamily: "Courier New",
+    margin: "auto",
+  },
+
+  LogInOut: {
+    fontSize: "50px",
+    fontWeight: "bold",
+    fontFamily: "Courier New",
+  },
+
+  UserInfo: {
+    fontSize: "40px",
+    fontWeight: "bold",
+    fontFamily: "Courier New",
+  },
+
+  ButtonPosition: {
+    paddingLeft: "30px",
+  },
+
+  ButtonPositionEnd: {
+    paddingLeft: "30px",
+    paddingRight: "30px",
+  },
+
+  ButtonPositionOut: {
+    paddingLeft: "100px",
+    fontSize: "40px",
+    fontWeight: "bold",
+    fontFamily: "Courier New",
+  },
+
+  Placeholder: {
+    fontSize: "21px",
+    fontWeight: "bold",
+    fontFamily: "Courier New",
+  }
+};
+
 class History extends Component {
   constructor(props) {
     super(props);
@@ -105,15 +148,15 @@ class History extends Component {
     }
 
     return (
-      <div style={{ paddingTop: "180px" }}>
-        <Link to="./">Back to Home</Link>
+      <div style={{ paddingTop: "200px", fontFamily: "Courier New", fontWeight: "bold"}}>
         <div id="wrapper">
           <header>
             <div id="page-banner">
-              <h1 class="title">History Page</h1>
+              <h1 class="title" style={styles.LogInOut}>History</h1>
               <form id="search-books">
                 <input
                   type="text"
+                  style={styles.Placeholder}
                   placeholder="Search History..."
                   onChange={this.handleSearch}
                 />
@@ -121,11 +164,11 @@ class History extends Component {
             </div>
           </header>
           <div id="book-list">
-            <h2 class="title">Recently Visited:</h2>
+            <h2 class="title" style={styles.LogInOut}>Recently Visited:</h2>
             <ul>{realTimeDisplay()}</ul>
           </div>
           <form id="add-cat">
-            <select id="category-list">
+            <select id="category-list" style={styles.Placeholder}>
               <option value="" disabled selected>
                 Select your Category...
               </option>
@@ -134,8 +177,8 @@ class History extends Component {
             </select>
           </form>
           <form id="add-book">
-            <input type="text" placeholder="Add a Place..." />
-            <button onClick={this.handleStore}>Add</button>
+            <input type="text" style={styles.Placeholder} placeholder="Add a Place..." />
+            <button onClick={this.handleStore} style={styles.Placeholder}>Add</button>
           </form>
         </div>
       </div>
