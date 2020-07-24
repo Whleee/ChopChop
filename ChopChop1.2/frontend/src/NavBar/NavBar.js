@@ -12,13 +12,13 @@ const styles = {
   },
 
   LogInOut: {
-    fontSize: "40px",
+    fontSize: "35px",
     fontWeight: "bold",
     fontFamily: "Courier New",
   },
 
   UserInfo: {
-    fontSize: "40px",
+    fontSize: "35px",
     fontWeight: "bold",
     fontFamily: "Courier New",
   },
@@ -59,7 +59,7 @@ function NavBar(props) {
             to="/testpage"
           >
             <button className="btn btn-warning" style={styles.LogInOut}>
-            Search
+              Search
             </button>
           </Link>
           <button
@@ -113,7 +113,8 @@ function NavBar(props) {
               Blacklist
             </button>
           </Link>
-          <button style={styles.ButtonPositionOut}
+          <button
+            style={styles.ButtonPositionOut}
             className="btn btn-info"
             style={styles.LogInOut}
             onClick={() => {

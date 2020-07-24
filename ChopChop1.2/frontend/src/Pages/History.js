@@ -45,7 +45,7 @@ const styles = {
     fontSize: "21px",
     fontWeight: "bold",
     fontFamily: "Courier New",
-  }
+  },
 };
 
 class History extends Component {
@@ -54,11 +54,31 @@ class History extends Component {
 
     this.state = {
       History: null,
+      lat: 1.3521,
+      lng: 103.8198,
+      location: false,
     };
   }
 
   shouldComponentUpdate() {
-    return false;
+    if (this.state.location) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  componentDidMount() {
+    if (navigator && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        const coords = pos.coords;
+        this.setState({
+          lat: coords.latitude,
+          lng: coords.longitude,
+          location: true,
+        });
+      });
+    }
   }
 
   //storing data
@@ -99,29 +119,60 @@ class History extends Component {
   };
 
   render() {
+    const { lat, lng, location } = this.state;
     function renderPlace(doc) {
-      const placeList = document.querySelector("#book-list ul");
+      if (doc == null || !location) {
+      } else {
+        const placeList = document.querySelector("#book-list ul");
 
-      let li = document.createElement("li");
-      let name = document.createElement("span");
-      let category = document.createElement("span");
-      let deletebtn = document.createElement("span");
+        let li = document.createElement("li");
+        let name = document.createElement("span");
+        let category = document.createElement("span");
+        let deletebtn = document.createElement("span");
+        var takebtn = document.createElement("a");
+        var link = document.createTextNode("Take me there");
+        const location = doc.data().name;
+        takebtn.appendChild(link);
+        takebtn.title = "Take me there";
+        takebtn.target = "_blank";
+        takebtn.href =
+          "https://google.com/maps/dir/" +
+          lat +
+          "," +
+          lng +
+          "/" +
+          location +
+          "/";
 
-      li.setAttribute("data-id", doc.id);
-      name.textContent = doc.data().name;
-      category.textContent = " " + "(" + doc.data().category + ")";
-      deletebtn.textContent = "delete";
+        li.setAttribute("data-id", doc.id);
+        name.textContent = doc.data().name;
+        category.textContent = " " + "(" + doc.data().category + ")";
+        deletebtn.textContent = "delete";
+        takebtn.textContent = "Take me there";
 
-      name.classList.add("name");
-      category.classList.add("category");
-      deletebtn.classList.add("delete");
-      deletebtn.addEventListener("click", handleDelete);
+        name.classList.add("name");
+        category.classList.add("category");
+        deletebtn.classList.add("delete");
+        deletebtn.addEventListener("click", handleDelete);
+        takebtn.classList.add("delete");
 
-      li.appendChild(name);
-      li.appendChild(category);
-      li.appendChild(deletebtn);
+        li.appendChild(name);
+        li.appendChild(category);
+        li.appendChild(deletebtn);
+        li.appendChild(takebtn);
 
-      placeList.appendChild(li);
+        placeList.appendChild(li);
+      }
+    }
+
+    function display() {
+      db.collection("History")
+        .get()
+        .then((snapshot) => {
+          snapshot.docs.forEach((doc) => {
+            renderPlace(doc);
+          });
+        });
     }
 
     function realTimeDisplay() {
@@ -148,11 +199,20 @@ class History extends Component {
     }
 
     return (
-      <div style={{ paddingTop: "200px", fontFamily: "Courier New", fontWeight: "bold"}}>
+      <div
+        style={{
+          paddingTop: "200px",
+          fontFamily: "Courier New",
+          fontWeight: "bold",
+          fontSize: "20px",
+        }}
+      >
         <div id="wrapper">
           <header>
             <div id="page-banner">
-              <h1 class="title" style={styles.LogInOut}>History</h1>
+              <h1 class="title" style={styles.LogInOut}>
+                History
+              </h1>
               <form id="search-books">
                 <input
                   type="text"
@@ -164,8 +224,10 @@ class History extends Component {
             </div>
           </header>
           <div id="book-list">
-            <h2 class="title" style={styles.LogInOut}>Recently Visited:</h2>
-            <ul>{realTimeDisplay()}</ul>
+            <h2 class="title" style={styles.LogInOut}>
+              Recently Visited:
+            </h2>
+            <ul>{display()}</ul>
           </div>
           <form id="add-cat">
             <select id="category-list" style={styles.Placeholder}>
@@ -177,8 +239,14 @@ class History extends Component {
             </select>
           </form>
           <form id="add-book">
-            <input type="text" style={styles.Placeholder} placeholder="Add a Place..." />
-            <button onClick={this.handleStore} style={styles.Placeholder}>Add</button>
+            <input
+              type="text"
+              style={styles.Placeholder}
+              placeholder="Add a Place..."
+            />
+            <button onClick={this.handleStore} style={styles.Placeholder}>
+              Add
+            </button>
           </form>
         </div>
       </div>

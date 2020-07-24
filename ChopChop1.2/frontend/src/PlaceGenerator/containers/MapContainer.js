@@ -30,6 +30,12 @@ const styles = {
     fontFamily: "Courier New",
   },
 
+  btns: {
+    fontSize: "25px",
+    fontWeight: "bold",
+    fontFamily: "Courier New",
+  },
+
   UserInfo: {
     fontSize: "40px",
     fontWeight: "bold",
@@ -61,17 +67,17 @@ const styles = {
   },
 
   CardHeader: {
-    fontSize: '50px',
+    fontSize: "50px",
     fontWeight: "bold",
-    fontFamily: 'Courier New',
+    fontFamily: "Courier New",
     color: "black",
   },
 
   CardBody: {
-    fontSize: '30px',
-    fontFamily: 'Courier New',
-    fontWeight: 'bold',
-    color: 'black',
+    fontSize: "30px",
+    fontFamily: "Courier New",
+    fontWeight: "bold",
+    color: "black",
   },
 
   FormBody: {
@@ -79,7 +85,7 @@ const styles = {
     fontWeight: "bold",
     fontFamily: "Courier New",
   },
-  
+
   ButtonPositioner: {
     paddingLeft: "50px",
   },
@@ -88,24 +94,24 @@ const styles = {
     fontSize: "40px",
     fontWeight: "bold",
     fontFamily: "Courier New",
-    padding: "10px 90px"
+    padding: "10px 90px",
   },
 
   CardHeader2: {
-    fontSize: '50px',
+    fontSize: "50px",
     fontWeight: "bold",
-    fontFamily: 'Courier New',
+    fontFamily: "Courier New",
     color: "black",
-    paddingLeft: "25%"
+    paddingLeft: "25%",
   },
 
   Results: {
-    fontSize: '25px',
+    fontSize: "25px",
     fontWeight: "bold",
-    fontFamily: 'Courier New',
+    fontFamily: "Courier New",
     color: "black",
-    paddingLeft: "25%"
-  }
+    paddingLeft: "25%",
+  },
 };
 
 const SG_COOR = { lat: 1.3521, lng: 103.8198 };
@@ -136,6 +142,9 @@ class MapsContainer extends Component {
       number: 0,
       car: false,
       walk: false,
+      searched: false,
+      stored: false,
+      storeCount: 0,
     };
   }
 
@@ -215,6 +224,7 @@ class MapsContainer extends Component {
 
   // With the constraints, find some places serving ice-cream
   handleSearch = () => {
+    this.setState({ searched: true });
     const {
       markers,
       constraints,
@@ -342,25 +352,60 @@ class MapsContainer extends Component {
       this.setState({
         retry: true,
         number: 0,
+        stored: false,
+        storeCount: 0,
       });
     } else {
       this.setState({
         retry: true,
         number: this.state.number + 1,
+        stored: false,
+        storeCount: 0,
       });
     }
   };
 
   //storing data
-  handleStore = (place) => {
-    //place.preventDefault();
+  handleFavourites = (place) => {
+    if (this.state.storeCount != 0) {
+      //need to add erorr msg here, that it is already stored
+    } else {
+      //place.preventDefault();
+      this.setState({
+        stored: true,
+        storeCount: 1,
+      });
 
+      const forms = document.forms;
+      const catForm = forms["test"];
+
+      db.collection("Favourites").add({
+        name: place.name,
+        category: catForm.querySelector('input[type = "text"]').value,
+        location: place.address,
+      });
+    }
+  };
+
+  handleHistory = (place) => {
     const forms = document.forms;
     const catForm = forms["test"];
 
-    db.collection("Favourites").add({
+    db.collection("History").add({
       name: place.name,
       category: catForm.querySelector('input[type = "text"]').value,
+      location: place.address,
+    });
+  };
+
+  handleBlacklist = (place) => {
+    const forms = document.forms;
+    const catForm = forms["test"];
+
+    db.collection("Blacklist").add({
+      name: place.name,
+      category: catForm.querySelector('input[type = "text"]').value,
+      location: place.address,
     });
   };
 
@@ -390,119 +435,149 @@ class MapsContainer extends Component {
       number,
       car,
       walk,
+      searched,
     } = this.state;
     const { autoCompleteService, geoCoderService } = this.state; // Google Maps Services
 
     return (
-      <div
-        className=""
-        style={styles.Positioner}
-      >
+      <div className="" style={styles.Positioner}>
         <div className="d-flex flex-wrap justify-content-center">
-        <div className="card-header bg-warning" style={styles.CardHeader}>Find something to do!</div>
-        {/* Constraints section */}
-        <div>
-          <h2 className="fw-md" style={styles.LogInOut2}>Choose your mode of transport!</h2>
-          <button className=" w-50 btn btn-dark" style={styles.LogInOut} onClick={this.handleCarClicked}>
-            Car
-          </button>
-          <button className="w-50 btn btn-success" style={styles.LogInOut} onClick={this.handleWalkClicked}>
-            Walk
-          </button>
-        </div>
+          <div className="card-header bg-warning" style={styles.CardHeader}>
+            Find something to do!
+          </div>
+          {/* Constraints section */}
+          <div>
+            <h2 className="fw-md" style={styles.LogInOut2}>
+              Choose your mode of transport!
+            </h2>
+            <button
+              className=" w-50 btn btn-dark"
+              style={styles.LogInOut}
+              onClick={this.handleCarClicked}
+            >
+              Car
+            </button>
+            <button
+              className="w-50 btn btn-success"
+              style={styles.LogInOut}
+              onClick={this.handleWalkClicked}
+            >
+              Walk
+            </button>
+          </div>
 
-        <section className="col-4">
-          {mapsLoaded && car ? (
-            <div>
-              {constraints.map((constraint, key) => {
-                const { name, time } = constraint;
-                return (
-                  <div key={key} className="mb-3" style={styles.LogInOut}>
-                    <div className="mb-2">
-                      <form id="test" stlye={styles.LogInOut}>
-                        <Input type="text" placeholder="Category" style={styles.FormBody}/>
-                      </form>
+          <section className="col-4">
+            {mapsLoaded && car ? (
+              <div>
+                {constraints.map((constraint, key) => {
+                  const { name, time } = constraint;
+                  return (
+                    <div key={key} className="mb-3" style={styles.LogInOut}>
+                      <div className="mb-2">
+                        <form id="test" stlye={styles.LogInOut}>
+                          <Input
+                            type="text"
+                            placeholder="Category"
+                            style={styles.FormBody}
+                          />
+                        </form>
+                      </div>
+                      <ConstraintSlider
+                        iconType="car"
+                        value={time}
+                        onChange={(value) =>
+                          this.updateConstraintTime(key, value)
+                        }
+                        text="Minutes away by car"
+                      />
+                      {/* Search Button */}
+                      <button
+                        className="btn btn-warning"
+                        onClick={this.handleSearch}
+                        style={styles.SearchButton}
+                      >
+                        Search!
+                      </button>
+                      {searched ? (
+                        <h2 className="fw-md" style={styles.LogInOut2}>
+                          Scroll down to see your results!
+                        </h2>
+                      ) : null}
+                      <Divider />
                     </div>
-                    <ConstraintSlider
-                      iconType="car"
-                      value={time}
-                      onChange={(value) =>
-                        this.updateConstraintTime(key, value)
-                      }
-                      text="Minutes away by car"
-                    />
-                    {/* Search Button */}
-                    <button
-                      className="btn btn-warning"
-                      onClick={this.handleSearch}
-                      style={styles.SearchButton}
-                    >
-                      Search!
-                    </button>
-                    <Divider />
-                  </div>
-                );
-              })}
-            </div>
-          ) : null}
+                  );
+                })}
+              </div>
+            ) : null}
 
-          {mapsLoaded && walk ? (
-            <div>
-              {constraints.map((constraint, key) => {
-                const { name, time } = constraint;
-                return (
-                  <div key={key} className="mb-3" style={styles.LogInOut}>
-                    <div className="d-flex mb-2">
-                      <form id="test" style={styles.LogInOut}>
-                        <Input type="text" placeholder="Category" style={styles.FormBody}/>
-                      </form>
+            {mapsLoaded && walk ? (
+              <div>
+                {constraints.map((constraint, key) => {
+                  const { name, time } = constraint;
+                  return (
+                    <div key={key} className="mb-3" style={styles.LogInOut}>
+                      <div className="d-flex mb-2">
+                        <form id="test" style={styles.LogInOut}>
+                          <Input
+                            type="text"
+                            placeholder="Category"
+                            style={styles.FormBody}
+                          />
+                        </form>
+                      </div>
+                      <ConstraintSlider
+                        iconType="heart"
+                        value={time}
+                        onChange={(value) =>
+                          this.updateConstraintTime(key, value)
+                        }
+                        text="Minutes away by walking"
+                      />
+                      {/* Search Button */}
+                      <button
+                        className="btn btn-warning"
+                        style={styles.SearchButton}
+                        onClick={this.handleSearch}
+                      >
+                        Search!
+                      </button>
+                      {searched ? (
+                        <h2 className="fw-md" style={styles.LogInOut2}>
+                          Scroll down to see your results!
+                        </h2>
+                      ) : null}
+                      <Divider />
                     </div>
-                    <ConstraintSlider
-                      iconType="heart"
-                      value={time}
-                      onChange={(value) =>
-                        this.updateConstraintTime(key, value)
-                      }
-                      text="Minutes away by walking"
-                    />
-                    {/* Search Button */}
-                    <button
-                      className="btn btn-warning" 
-                      style={styles.SearchButton}       
-                      onClick={this.handleSearch}
-                    >
-                      Search!
-                    </button>
-                    <Divider />
-                  </div>
-                );
-              })}
-            </div>
-          ) : null}
-        </section>
+                  );
+                })}
+              </div>
+            ) : null}
+          </section>
 
-        {/* Maps Section */}
-        <section className="col-10 h-lg" style={{paddingBottom: "50px"}}>
-          <GoogleMapReact
-            bootstrapURLKeys={{
-              key: "AIzaSyBQlZDHkXFuTFhDdgn8T286dkWQije7d80",
-              libraries: ["places", "directions"],
-            }}
-            defaultZoom={14}
-            defaultCenter={{
-              lat: this.state.currentLocation.lat,
-              lng: this.state.currentLocation.lng,
-            }}
-            yesIWantToUseGoogleMapApiInternals={true}
-            onGoogleApiLoaded={({ map, maps }) => this.apiHasLoaded(map, maps)} // "maps" is the mapApi. Bad naming but that's their library.
-          >
-            <MapMarker
-              name="current location"
-              lat={this.state.currentLocation.lat}
-              lng={this.state.currentLocation.lng}
-            />
-          </GoogleMapReact>
-        </section>
+          {/* Maps Section */}
+          <section className="col-10 h-lg" style={{ paddingBottom: "50px" }}>
+            <GoogleMapReact
+              bootstrapURLKeys={{
+                key: "AIzaSyBQlZDHkXFuTFhDdgn8T286dkWQije7d80",
+                libraries: ["places", "directions"],
+              }}
+              defaultZoom={15}
+              defaultCenter={{
+                lat: this.state.currentLocation.lat,
+                lng: this.state.currentLocation.lng,
+              }}
+              yesIWantToUseGoogleMapApiInternals={true}
+              onGoogleApiLoaded={({ map, maps }) =>
+                this.apiHasLoaded(map, maps)
+              } // "maps" is the mapApi. Bad naming but that's their library.
+            >
+              <MapMarker
+                name="current location"
+                lat={this.state.currentLocation.lat}
+                lng={this.state.currentLocation.lng}
+              />
+            </GoogleMapReact>
+          </section>
         </div>
 
         {/* Results section */}
@@ -511,7 +586,12 @@ class MapsContainer extends Component {
             <Divider />
             <section>
               <div>
-              <div className="card-header bg-warning" style={styles.CardHeader2}>Here's where to go!</div>
+                <div
+                  className="card-header bg-warning"
+                  style={styles.CardHeader2}
+                >
+                  Here's where to go!
+                </div>
                 <div className="d-flex flex-wrap">
                   {/* 
                   {searchResults.map((result, key) => (
@@ -519,11 +599,15 @@ class MapsContainer extends Component {
                   ))}
                   */}
                   {!this.state.retry ? (
-                     <PlaceCard id="result" info={searchResults[number]} />
-                    ) : (
+                    <PlaceCard id="result" info={searchResults[number]} />
+                  ) : (
                     <PlaceCard id="result" info={searchResults[number]} />
                   )}
-                  <button className="btns mb-5" style={styles.LogInOut} onClick={this.handleRetryClicked}>
+                  <button
+                    className="btns mb-5"
+                    style={styles.btns}
+                    onClick={this.handleRetryClicked}
+                  >
                     Try Again
                   </button>
                   <a
@@ -539,11 +623,35 @@ class MapsContainer extends Component {
                       "/"
                     }
                   >
-                    <button style={styles.LogInOut}>Take me there!</button>
+                    <button
+                      style={styles.btns}
+                      onClick={this.handleHistory.bind(
+                        this,
+                        searchResults[number]
+                      )}
+                    >
+                      Take me there!
+                    </button>
                   </a>
 
-                
-                  <button className="btns" style={styles.LogInOut} onClick={this.handleRetryClicked}>
+                  <button
+                    className="btns"
+                    style={styles.btns}
+                    onClick={this.handleFavourites.bind(
+                      this,
+                      searchResults[number]
+                    )}
+                  >
+                    Add to Favourites
+                  </button>
+                  <button
+                    className="btns"
+                    style={styles.btns}
+                    onClick={this.handleBlacklist.bind(
+                      this,
+                      searchResults[number]
+                    )}
+                  >
                     Add to Blacklist
                   </button>
                 </div>

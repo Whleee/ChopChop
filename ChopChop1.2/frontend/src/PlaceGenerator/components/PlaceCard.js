@@ -4,12 +4,12 @@ import { Rate } from "antd";
 // TODO: info is bad naming.
 const styles = {
   Styling: {
-    fontSize: "35px",
+    fontSize: "25px",
     fontWeight: "bold",
     fontFamily: "Courier New",
-    paddingTop: "30px"
-  }
-}
+    paddingTop: "30px",
+  },
+};
 const PlaceCard = ({ info, key }) => {
   const {
     address,
@@ -23,15 +23,18 @@ const PlaceCard = ({ info, key }) => {
   } = info;
   return (
     <div key={key} className="w-100 mx-4 mt-5">
-      <img
-        src={photoUrl}
-        className="image-wrapper-sm my-3"
-        alt="image not available"
-      />
       <div className="card" style={styles.Styling}>
         <div className="card-header">
-          <h1 className="card-body"  style={{backgroundColor: "#343A40", 
-          fontWeight:"bold", color:"#FFFFFF"}}>{name}</h1>
+          <h1
+            className="card-body"
+            style={{
+              backgroundColor: "#343A40",
+              fontWeight: "bold",
+              color: "#FFFFFF",
+            }}
+          >
+            {name}
+          </h1>
           <span className="d-block mb-1">{address}</span>
           <span className="d-block">{distanceText}</span>
           <span className="d-block">{timeText}</span>
@@ -50,6 +53,11 @@ const PlaceCard = ({ info, key }) => {
           </li>
         </ul>
       </div>
+      <img
+        src={photoUrl}
+        className="image-wrapper-sm"
+        alt="image not available"
+      />
     </div>
   );
 };
