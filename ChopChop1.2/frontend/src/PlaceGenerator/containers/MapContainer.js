@@ -11,6 +11,7 @@ import { BrowserRouter as Router, Redirect } from "react-router-dom";
 
 import { Button, Input, Divider, message } from "antd";
 import App from "../App2";
+import auth0Client from "../../Auth";
 
 const styles = {
   Positioner: {
@@ -145,7 +146,15 @@ class MapsContainer extends Component {
       searched: false,
       stored: false,
       storeCount: 0,
+      searchedDone: false,
+      limit: false,
+      blacklisted: false,
+      catEmpty: false,
     };
+  }
+
+  shouldComponentUpdate() {
+    return true;
   }
 
   componentDidMount() {
@@ -224,136 +233,171 @@ class MapsContainer extends Component {
 
   // With the constraints, find some places serving ice-cream
   handleSearch = () => {
-    this.setState({ searched: true });
-    const {
-      markers,
-      constraints,
-      placesService,
-      directionService,
-      mapsApi,
-    } = this.state;
-    //if (markers.length === 0) {
-    //  message.warn("Add a constraint and try again!");
-    //  return;
-    // }
-    const filteredResults = [];
-    const marker = markers[0];
-    const timeLimit = constraints[0].time;
-    const latitude = this.state.currentLocation.lat;
-    const longitude = this.state.currentLocation.lng;
-    const markerLatLng = new mapsApi.LatLng(latitude, longitude);
+    if (this.state.searchedDone) {
+    } else {
+      this.setState({ searched: true });
+      const {
+        markers,
+        constraints,
+        placesService,
+        directionService,
+        mapsApi,
+      } = this.state;
+      //if (markers.length === 0) {
+      //  message.warn("Add a constraint and try again!");
+      //  return;
+      // }
+      const filteredResults = [];
+      const marker = markers[0];
+      const timeLimit = constraints[0].time;
+      const latitude = this.state.currentLocation.lat;
+      const longitude = this.state.currentLocation.lng;
+      const markerLatLng = new mapsApi.LatLng(latitude, longitude);
+      const forms = document.forms;
+      const catForm = forms["test"];
+      const category = catForm.querySelector('input[type = "text"]').value;
+
+      const placesRequest = {
+        location: markerLatLng,
+        // radius: '30000', // Cannot be used with rankBy. Pick your poison!
+        //type: [category], // List of types: https://developers.google.com/places/supported_types
+        query: category,
+        rankBy: mapsApi.places.RankBy.DISTANCE, // Cannot be used with radius.
+      };
+
+      // First, search for ice cream shops.
+      placesService.textSearch(placesRequest, (response) => {
+        // Only look at the nearest top 5.
+        const responseLimit = Math.min(10, response.length);
+        for (let i = 0; i < responseLimit; i++) {
+          const iceCreamPlace = response[i];
+          const coords = {
+            lat: iceCreamPlace.geometry.location.lat,
+            lng: iceCreamPlace.geometry.location.lng,
+          };
+          const { rating, name } = iceCreamPlace;
+          const address = iceCreamPlace.formatted_address; // e.g 80 mandai Lake Rd,
+          const priceLevel = iceCreamPlace.price_level; // 1, 2, 3...
+          let photoUrl = "";
+          let openNow = false;
+          if (iceCreamPlace.opening_hours) {
+            openNow = iceCreamPlace.opening_hours.open_now; // e.g true/false
+          }
+          if (iceCreamPlace.photos && iceCreamPlace.photos.length > 0) {
+            photoUrl = iceCreamPlace.photos[0].getUrl();
+          }
+
+          // Second, For each iceCreamPlace, check if it is within acceptable travelling distance
+          const directionRequest = {
+            origin: markerLatLng,
+            destination: address, // Address of ice cream place
+            travelMode: "DRIVING",
+          };
+
+          const directionRequest2 = {
+            origin: markerLatLng,
+            destination: address, // Address of ice cream place
+            travelMode: "WALKING",
+          };
+
+          if (this.state.car) {
+            directionService.route(directionRequest, (result, status) => {
+              if (status !== "OK") {
+                return;
+              }
+              const travellingRoute = result.routes[0].legs[0]; // { duration: { text: 1mins, value: 600 } }
+              const travellingTimeInMinutes =
+                travellingRoute.duration.value / 60;
+              if (travellingTimeInMinutes < timeLimit) {
+                const distanceText = travellingRoute.distance.text; // 6.4km
+                const timeText = travellingRoute.duration.text; // 11 mins
+                filteredResults.push({
+                  name,
+                  rating,
+                  address,
+                  openNow,
+                  priceLevel,
+                  photoUrl,
+                  distanceText,
+                  timeText,
+                  coords,
+                });
+              }
+              // Finally, Add results to state
+              this.setState({ searchResults: filteredResults });
+              this.setState({ searchedDone: true });
+            });
+          } else if (this.state.walk) {
+            directionService.route(directionRequest2, (result, status) => {
+              if (status !== "OK") {
+                return;
+              }
+              const travellingRoute = result.routes[0].legs[0]; // { duration: { text: 1mins, value: 600 } }
+              const travellingTimeInMinutes =
+                travellingRoute.duration.value / 60;
+              if (travellingTimeInMinutes < timeLimit) {
+                const distanceText = travellingRoute.distance.text; // 6.4km
+                const timeText = travellingRoute.duration.text; // 11 mins
+                filteredResults.push({
+                  name,
+                  rating,
+                  address,
+                  openNow,
+                  priceLevel,
+                  photoUrl,
+                  distanceText,
+                  timeText,
+                  coords,
+                });
+              }
+              // Finally, Add results to state
+              this.setState({ searchResults: filteredResults });
+              this.setState({ searchedDone: true });
+            });
+          }
+        }
+      });
+    }
+  };
+
+  filterSearch = (place) => {
+    db.collection("Blacklist")
+      .get()
+      .then((snapshot) => {
+        snapshot.docs.forEach((marked) => {
+          return place === marked.data().name;
+        });
+      });
+  };
+
+  handleSearch2 = () => {
     const forms = document.forms;
     const catForm = forms["test"];
-    const category = catForm.querySelector('input[type = "text"]').value;
+    let value = catForm.querySelector('input[type = "text"]').value;
 
-    const placesRequest = {
-      location: markerLatLng,
-      // radius: '30000', // Cannot be used with rankBy. Pick your poison!
-      //type: [category], // List of types: https://developers.google.com/places/supported_types
-      query: category,
-      rankBy: mapsApi.places.RankBy.DISTANCE, // Cannot be used with radius.
-    };
+    if (value == "") {
+      this.setState({ catEmpty: true });
+    }
+  };
 
-    // First, search for ice cream shops.
-    placesService.textSearch(placesRequest, (response) => {
-      // Only look at the nearest top 5.
-      const responseLimit = Math.min(10, response.length);
-      for (let i = 0; i < responseLimit; i++) {
-        const iceCreamPlace = response[i];
-        const coords = {
-          lat: iceCreamPlace.geometry.location.lat,
-          lng: iceCreamPlace.geometry.location.lng,
-        };
-        const { rating, name } = iceCreamPlace;
-        const address = iceCreamPlace.formatted_address; // e.g 80 mandai Lake Rd,
-        const priceLevel = iceCreamPlace.price_level; // 1, 2, 3...
-        let photoUrl = "";
-        let openNow = false;
-        if (iceCreamPlace.opening_hours) {
-          openNow = iceCreamPlace.opening_hours.open_now; // e.g true/false
-        }
-        if (iceCreamPlace.photos && iceCreamPlace.photos.length > 0) {
-          photoUrl = iceCreamPlace.photos[0].getUrl();
-        }
-
-        // Second, For each iceCreamPlace, check if it is within acceptable travelling distance
-        const directionRequest = {
-          origin: markerLatLng,
-          destination: address, // Address of ice cream place
-          travelMode: "DRIVING",
-        };
-
-        const directionRequest2 = {
-          origin: markerLatLng,
-          destination: address, // Address of ice cream place
-          travelMode: "WALKING",
-        };
-
-        if (this.state.car) {
-          directionService.route(directionRequest, (result, status) => {
-            if (status !== "OK") {
-              return;
-            }
-            const travellingRoute = result.routes[0].legs[0]; // { duration: { text: 1mins, value: 600 } }
-            const travellingTimeInMinutes = travellingRoute.duration.value / 60;
-            if (travellingTimeInMinutes < timeLimit) {
-              const distanceText = travellingRoute.distance.text; // 6.4km
-              const timeText = travellingRoute.duration.text; // 11 mins
-              filteredResults.push({
-                name,
-                rating,
-                address,
-                openNow,
-                priceLevel,
-                photoUrl,
-                distanceText,
-                timeText,
-                coords,
-              });
-            }
-            // Finally, Add results to state
-            this.setState({ searchResults: filteredResults });
-          });
-        } else if (this.state.walk) {
-          directionService.route(directionRequest2, (result, status) => {
-            if (status !== "OK") {
-              return;
-            }
-            const travellingRoute = result.routes[0].legs[0]; // { duration: { text: 1mins, value: 600 } }
-            const travellingTimeInMinutes = travellingRoute.duration.value / 60;
-            if (travellingTimeInMinutes < timeLimit) {
-              const distanceText = travellingRoute.distance.text; // 6.4km
-              const timeText = travellingRoute.duration.text; // 11 mins
-              filteredResults.push({
-                name,
-                rating,
-                address,
-                openNow,
-                priceLevel,
-                photoUrl,
-                distanceText,
-                timeText,
-                coords,
-              });
-            }
-            // Finally, Add results to state
-            this.setState({ searchResults: filteredResults });
-          });
-        }
-      }
-    });
+  handleSearchMaster = () => {
+    this.handleSearch();
+    this.handleSearch2();
   };
 
   handleRetryClicked = () => {
     const searchResults = this.state.searchResults;
     const limit = searchResults.length;
     const currNumber = this.state.number;
+
     if (currNumber == limit - 1) {
       this.setState({
         retry: true,
         number: 0,
         stored: false,
         storeCount: 0,
+        limit: true,
+        blacklisted: false,
       });
     } else {
       this.setState({
@@ -361,6 +405,7 @@ class MapsContainer extends Component {
         number: this.state.number + 1,
         stored: false,
         storeCount: 0,
+        blacklisted: false,
       });
     }
   };
@@ -399,20 +444,29 @@ class MapsContainer extends Component {
   };
 
   handleBlacklist = (place) => {
-    const forms = document.forms;
-    const catForm = forms["test"];
+    if (this.state.blacklisted) {
+    } else {
+      const forms = document.forms;
+      const catForm = forms["test"];
 
-    db.collection("Blacklist").add({
-      name: place.name,
-      category: catForm.querySelector('input[type = "text"]').value,
-      location: place.address,
-    });
+      db.collection("Blacklist").add({
+        name: place.name,
+        category: catForm.querySelector('input[type = "text"]').value,
+        location: place.address,
+      });
+
+      this.setState({
+        blacklisted: true,
+      });
+    }
   };
 
   handleCarClicked = () => {
     this.setState({
       car: true,
       walk: false,
+      searchedDone: false,
+      searched: false,
     });
   };
 
@@ -420,6 +474,8 @@ class MapsContainer extends Component {
     this.setState({
       walk: true,
       car: false,
+      searchedDone: false,
+      searched: false,
     });
   };
 
@@ -436,6 +492,7 @@ class MapsContainer extends Component {
       car,
       walk,
       searched,
+      searchedDone,
     } = this.state;
     const { autoCompleteService, geoCoderService } = this.state; // Google Maps Services
 
@@ -493,14 +550,32 @@ class MapsContainer extends Component {
                       {/* Search Button */}
                       <button
                         className="btn btn-warning"
-                        onClick={this.handleSearch}
+                        onClick={this.handleSearchMaster}
                         style={styles.SearchButton}
                       >
                         Search!
                       </button>
-                      {searched ? (
+                      {this.state.catEmpty ? (
+                        <h2 className="fw-md" style={styles.LogInOut2}>
+                          Fill in a category!
+                        </h2>
+                      ) : null}
+                      {searched &&
+                      car &&
+                      !searchedDone &&
+                      !this.state.catEmpty ? (
+                        <h2 className="fw-md" style={styles.LogInOut2}>
+                          Loading...
+                        </h2>
+                      ) : null}
+                      {searchedDone && car && searchResults.length > 0 ? (
                         <h2 className="fw-md" style={styles.LogInOut2}>
                           Scroll down to see your results!
+                        </h2>
+                      ) : null}
+                      {searchedDone && car && searchResults.length == 0 ? (
+                        <h2 className="fw-md" style={styles.LogInOut2}>
+                          Nothing found :(
                         </h2>
                       ) : null}
                       <Divider />
@@ -537,13 +612,31 @@ class MapsContainer extends Component {
                       <button
                         className="btn btn-warning"
                         style={styles.SearchButton}
-                        onClick={this.handleSearch}
+                        onClick={this.handleSearchMaster}
                       >
                         Search!
                       </button>
-                      {searched ? (
+                      {this.state.catEmpty ? (
+                        <h2 className="fw-md" style={styles.LogInOut2}>
+                          Fill in a category!
+                        </h2>
+                      ) : null}
+                      {searched &&
+                      walk &&
+                      !searchedDone &&
+                      !this.state.catEmpty ? (
+                        <h2 className="fw-md" style={styles.LogInOut2}>
+                          Loading...
+                        </h2>
+                      ) : null}
+                      {searchedDone && walk && searchResults.length > 0 ? (
                         <h2 className="fw-md" style={styles.LogInOut2}>
                           Scroll down to see your results!
+                        </h2>
+                      ) : null}
+                      {searchedDone && walk && searchResults.length == 0 ? (
+                        <h2 className="fw-md" style={styles.LogInOut2}>
+                          Nothing found :(
                         </h2>
                       ) : null}
                       <Divider />
@@ -572,7 +665,7 @@ class MapsContainer extends Component {
               } // "maps" is the mapApi. Bad naming but that's their library.
             >
               <MapMarker
-                name="current location"
+                name="CURRENT LOCATION"
                 lat={this.state.currentLocation.lat}
                 lng={this.state.currentLocation.lng}
               />
@@ -598,7 +691,7 @@ class MapsContainer extends Component {
                     <PlaceCard info={result} key={key} />
                   ))}
                   */}
-                  {!this.state.retry ? (
+                  {!this.state.retry && !this.state.limit ? (
                     <PlaceCard id="result" info={searchResults[number]} />
                   ) : (
                     <PlaceCard id="result" info={searchResults[number]} />
@@ -634,26 +727,39 @@ class MapsContainer extends Component {
                     </button>
                   </a>
 
-                  <button
-                    className="btns"
-                    style={styles.btns}
-                    onClick={this.handleFavourites.bind(
-                      this,
-                      searchResults[number]
-                    )}
-                  >
-                    Add to Favourites
-                  </button>
-                  <button
-                    className="btns"
-                    style={styles.btns}
-                    onClick={this.handleBlacklist.bind(
-                      this,
-                      searchResults[number]
-                    )}
-                  >
-                    Add to Blacklist
-                  </button>
+                  {auth0Client.isAuthenticated() && (
+                    <button
+                      className="btns"
+                      style={styles.btns}
+                      onClick={this.handleFavourites.bind(
+                        this,
+                        searchResults[number]
+                      )}
+                    >
+                      Add to Favourites
+                    </button>
+                  )}
+
+                  {auth0Client.isAuthenticated() && this.state.stored ? (
+                    <h3>Item is stored!</h3>
+                  ) : null}
+
+                  {auth0Client.isAuthenticated() && (
+                    <button
+                      className="btns"
+                      style={styles.btns}
+                      onClick={this.handleBlacklist.bind(
+                        this,
+                        searchResults[number]
+                      )}
+                    >
+                      Add to Blacklist
+                    </button>
+                  )}
+
+                  {auth0Client.isAuthenticated() && this.state.blacklisted ? (
+                    <h3>Item is blacklisted!</h3>
+                  ) : null}
                 </div>
               </div>
             </section>
