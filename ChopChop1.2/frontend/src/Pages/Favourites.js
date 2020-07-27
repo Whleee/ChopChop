@@ -195,9 +195,7 @@ class Favourites extends Component {
 
     function handleDelete() {
       let id = this.parentElement.getAttribute("data-id");
-      db.collection("Favourites")
-        .doc(id)
-        .delete();
+      db.collection("Favourites").doc(id).delete();
     }
 
     return (
@@ -231,25 +229,6 @@ class Favourites extends Component {
             </h2>
             <ul>{display()}</ul>
           </div>
-          <form id="add-cat">
-            <select id="category-list" style={styles.Placeholder}>
-              <option value="" disabled selected>
-                Select your Category
-              </option>
-              <option value="Food">Food</option>
-              <option value="Entertainment">Entertainment</option>
-            </select>
-          </form>
-          <form id="add-book">
-            <input
-              type="text"
-              style={styles.Placeholder}
-              placeholder="Add a Place..."
-            />
-            <button onClick={this.handleStore} style={styles.Placeholder}>
-              Add
-            </button>
-          </form>
         </div>
       </div>
     );

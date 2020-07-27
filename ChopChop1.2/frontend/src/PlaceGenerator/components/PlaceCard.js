@@ -23,6 +23,11 @@ const PlaceCard = ({ info, key }) => {
   } = info;
   return (
     <div key={key} className="w-100 mx-4 mt-5">
+      <img
+        src={photoUrl}
+        className="image-wrapper-sm"
+        alt="image not available"
+      />
       <div className="card" style={styles.Styling}>
         <div className="card-header">
           <h1
@@ -53,11 +58,6 @@ const PlaceCard = ({ info, key }) => {
           </li>
         </ul>
       </div>
-      <img
-        src={photoUrl}
-        className="image-wrapper-sm"
-        alt="image not available"
-      />
     </div>
   );
 };
