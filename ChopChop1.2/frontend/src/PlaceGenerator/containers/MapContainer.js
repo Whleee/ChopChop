@@ -305,6 +305,7 @@ class MapsContainer extends Component {
               if (status !== "OK") {
                 return;
               }
+
               const travellingRoute = result.routes[0].legs[0]; // { duration: { text: 1mins, value: 600 } }
               const travellingTimeInMinutes =
                 travellingRoute.duration.value / 60;
@@ -360,16 +361,6 @@ class MapsContainer extends Component {
     }
   };
 
-  filterSearch = (place) => {
-    db.collection("Blacklist")
-      .get()
-      .then((snapshot) => {
-        snapshot.docs.forEach((marked) => {
-          return place === marked.data().name;
-        });
-      });
-  };
-
   handleSearch2 = () => {
     const forms = document.forms;
     const catForm = forms["test"];
@@ -380,9 +371,33 @@ class MapsContainer extends Component {
     }
   };
 
+  filterSearch = () => {
+    let places = this.state.searchResults;
+    let updatedPlaces = [];
+    for (let i = 0; i < places.length; i++) {
+      let safe = true;
+      let place1 = places[i].name;
+      db.collection("Blacklist")
+        .get()
+        .then((snapshot) => {
+          snapshot.docs.forEach((marked) => {
+            let place2 = marked.data().name;
+            if (place1 === place2) {
+              safe = false;
+            }
+          });
+        });
+      if ((safe = true)) {
+        updatedPlaces.push(places[i]);
+      }
+    }
+    this.setState({ searchResults: updatedPlaces });
+  };
+
   handleSearchMaster = () => {
     this.handleSearch();
     this.handleSearch2();
+    this.filterSearch();
   };
 
   handleRetryClicked = () => {
